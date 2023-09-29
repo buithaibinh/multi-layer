@@ -36,7 +36,11 @@ export default class DrawWindow extends BrowserWindow {
       );
     }
     //Set on top with level screen-saver(101) higher level dock-window(20) and lower BorderWindow and ActionWindow
-    this.setAlwaysOnTop(true, 'screen-saver', 1);
+    this.setAlwaysOnTop(true, 'screen-saver');
+    //If device not MacOs, set fullscreen to hide the taskbar
+    if (process.platform !== 'darwin') {
+      this.setFullScreen(true);
+    }
     // Open the DevTools.
     // this.webContents.openDevTools({ mode: 'detach' });
   }

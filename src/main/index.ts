@@ -38,14 +38,20 @@ const createDrawWindow = () => {
 
 const toggleDrawWindow = () => {
   // Toggle drawWindow
+  const borderWindow = windows.get('borderWindow');
+  const actionWindow = windows.get('actionWindow');
+  const drawWindow = windows.get('drawWindow');
   if (windows.has('drawWindow')) {
-    const drawWindow = windows.get('drawWindow');
     if (drawWindow.isVisible()) {
+      borderWindow.setParentWindow(null);
+      actionWindow.setParentWindow(null);
       drawWindow.hide();
+      actionWindow.setParentWindow(borderWindow);
       //Send message to drawWindow to clear canvas
       drawWindow.webContents.send('clear-canvas');
     } else {
       drawWindow.show();
+      borderWindow.setParentWindow(drawWindow);
     }
   }
 };

@@ -34,10 +34,14 @@ export default class BorderWindow extends BrowserWindow {
         )
       );
     }
-    //Set on top with level screen-saver(101) higher level dock-window(20)
-    this.setAlwaysOnTop(true, 'screen-saver', 2);
+    //Set on top with level screen-saver(101)
+    this.setAlwaysOnTop(true, 'screen-saver');
     //Set ignore mouse event
     this.setIgnoreMouseEvents(true);
+    //If device not MacOs, set fullscreen to hide the taskbar
+    if (process.platform !== 'darwin') {
+      this.setFullScreen(true);
+    }
     // Open the DevTools.
     // this.webContents.openDevTools({ mode: 'detach' });
   }
