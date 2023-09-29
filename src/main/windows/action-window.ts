@@ -14,6 +14,8 @@ export default class DrawWindow extends BrowserWindow {
       enableLargerThanScreen: true,
       resizable: false,
       movable: true,
+      //In Windows, the taskbar will not show the icon of the window
+      skipTaskbar: true,
       //Make frameless window (without title bar and border)
       frame: false,
       webPreferences: {

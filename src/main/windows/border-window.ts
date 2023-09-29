@@ -15,6 +15,8 @@ export default class BorderWindow extends BrowserWindow {
       enableLargerThanScreen: true,
       resizable: false,
       movable: false,
+      //In Windows, the taskbar will not show the icon of the window
+      skipTaskbar: true,
       //Make frameless window (without title bar and border)
       frame: false,
       //Make the window transparent
