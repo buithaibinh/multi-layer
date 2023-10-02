@@ -79,6 +79,7 @@ const handleSelectSource = async (sourceId: string) => {
         },
       },
     });
+
     handleStream(stream);
   } catch (error) {
     handleError(error);

@@ -8,6 +8,10 @@ import {
   SourceWindow,
 } from './windows';
 
+// Command line
+// https://github.com/electron/electron/issues/19880#issuecomment-618222048
+app.commandLine.appendSwitch('disable-features', 'IOSurfaceCapturer');
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
