@@ -1,5 +1,12 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
-import { ActionWindow, BorderWindow, DrawWindow } from './windows';
+import { app, BrowserWindow, ipcMain, desktopCapturer, dialog } from 'electron';
+import { writeFile } from 'fs/promises';
+
+import {
+  ActionWindow,
+  BorderWindow,
+  DrawWindow,
+  SourceWindow,
+} from './windows';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -36,6 +43,15 @@ const createDrawWindow = () => {
   windows.set('drawWindow', drawWindow);
 };
 
+const createMainWindow = () => {
+  if (windows.has('sourceWindow')) {
+    return;
+  }
+  const window = new SourceWindow();
+  window.setParentWindow(windows.get('borderWindow'));
+  windows.set('sourceWindow', window);
+};
+
 const toggleDrawWindow = () => {
   // Toggle drawWindow
   const borderWindow = windows.get('borderWindow');
@@ -55,7 +71,59 @@ const toggleDrawWindow = () => {
     }
   }
 };
-// Check if the borderWindow is already open do not create a new one
+
+const handleSelectSource = async (event: any, sourceId: any) => {
+  const sourceWindow = windows.get('sourceWindow');
+  // close sourceWindow
+  sourceWindow.close();
+
+  // send sourceId to actionWindow
+  const actionWindow = windows.get('actionWindow');
+  actionWindow.webContents.send('sourceId-selected', sourceId);
+};
+
+const handleGetSources = async () => {
+  try {
+    console.log('get-sources from main');
+    const sources = await desktopCapturer.getSources({
+      types: ['screen', 'window'],
+    });
+    // convert thumbnail to base64
+    sources.forEach((source: any) => {
+      const isThumbnailEmpty = source.thumbnail.isEmpty();
+      if (isThumbnailEmpty) {
+        source.thumbnail = null;
+        return;
+      }
+      source.thumbnail = source.thumbnail?.toDataURL();
+    });
+    return sources;
+  } catch (error) {
+    console.log('error', error);
+    return [];
+  }
+};
+
+const handleSave = async (event: any, buffer: any) => {
+
+  console.log('save-video from main');
+  const { canceled, filePath } = await dialog.showSaveDialog({
+    buttonLabel: 'Save video',
+    defaultPath: `vid-${Date.now()}.webm`,
+  });
+
+
+  if (canceled) {
+    console.log('user canceled save video');
+    return;
+  }
+
+  console.log('save video to', filePath);
+
+  await writeFile(filePath, buffer);
+  console.log('video saved successfully!');
+  return filePath;
+};
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -64,6 +132,13 @@ app.on('ready', () => {
   createBorderWindow();
   createActionWindow();
   createDrawWindow();
+  createMainWindow();
+
+  //Handle ipcMain events
+
+  ipcMain.handle('get-sources', handleGetSources);
+  ipcMain.handle('select-source', handleSelectSource);
+  ipcMain.handle('save-video', handleSave);
 
   //Handle ipcMain events
   ipcMain.on('toggle-draw', () => {

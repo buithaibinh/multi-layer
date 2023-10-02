@@ -36,3 +36,40 @@ toggleDrawBtn.addEventListener('click', () => {
 console.log(
   '👋 This message is being logged by "renderer.ts", included via Vite'
 );
+
+let state = 'idle';
+const startButton = document.getElementById('btnStart');
+const pauseButton = document.getElementById('btnPause');
+
+window.api.onSourceWindowReady(() => {
+  console.log('source window ready');
+  state = 'ready';
+});
+
+startButton.addEventListener('click', () => {
+  console.log('state', state);
+  if (state === 'idle') {
+    console.log('select source');
+  } else if (state === 'ready') {
+    console.log('start recording');
+    window.api.startRecording();
+    state = 'recording';
+    startButton.innerHTML = 'Stop';
+  } else if (state === 'recording') {
+    window.api.stopRecording();
+    console.log('stop recording');
+    state = 'idle';
+  }
+});
+
+pauseButton.addEventListener('click', () => {
+  if (state === 'recording') {
+    window.api.pauseRecording();
+    state = 'paused';
+    pauseButton.innerHTML = 'Resume';
+  } else if (state === 'paused') {
+    window.api.resumeRecording();
+    state = 'recording';
+    pauseButton.innerHTML = 'Pause';
+  }
+});

@@ -1,19 +1,31 @@
-import { BrowserWindow } from 'electron';
+import {
+  BrowserWindow,
+  ipcMain,
+  desktopCapturer,
+  dialog,
+  screen,
+} from 'electron';
 import path from 'path';
+import { writeFile } from 'fs/promises';
 // Define class DrawWindow extends from BrowserWindow
-export default class DrawWindow extends BrowserWindow {
+
+export default class Window extends BrowserWindow {
   constructor() {
     // Get the width and height of the primary display
+    const mainScreen = screen.getPrimaryDisplay();
+    const w = 450;
+    const h = 400;
     super({
-      width: 90,
-      height: 200,
-      x: 0,
-      y: 0,
+      width: w,
+      height: h,
+      // display window at bottom left corner
+      x: mainScreen.size.width/2 - w,
+      y: mainScreen.size.height/2 - h,
       hasShadow: false,
       //Make the window larger than the screen (outside the dock bar)
       enableLargerThanScreen: true,
-      resizable: false,
       movable: true,
+      resizable: false,
       //In Windows, the taskbar will not show the icon of the window
       skipTaskbar: true,
       //Make frameless window (without title bar and border)
@@ -24,12 +36,12 @@ export default class DrawWindow extends BrowserWindow {
     });
     // and load the index.html of the app.
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-      this.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/actionWindow.html`);
+      this.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/sourceWindow.html`);
     } else {
       this.loadFile(
         path.join(
           __dirname,
-          `../renderer/${MAIN_WINDOW_VITE_NAME}/actionWindow.html`
+          `../renderer/${MAIN_WINDOW_VITE_NAME}/sourceWindow.html`
         )
       );
     }
@@ -39,7 +51,6 @@ export default class DrawWindow extends BrowserWindow {
     this.setAlwaysOnTop(true, 'screen-saver');
     // Open the DevTools.
     // this.webContents.openDevTools({ mode: 'detach' });
-
-    this.setContentProtection(true);
   }
+
 }
