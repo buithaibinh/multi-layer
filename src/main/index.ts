@@ -10,7 +10,8 @@ import {
 
 // Command line
 // https://github.com/electron/electron/issues/19880#issuecomment-618222048
-app.commandLine.appendSwitch('disable-features', 'IOSurfaceCapturer');
+// app.commandLine.appendSwitch('disable-features', 'IOSurfaceCapturer');
+app.commandLine.appendSwitch('enable-features', 'ScreenCaptureKitMac');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
